@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "Web3 Frontend MVP",
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-dvh bg-white text-zinc-900">
-        <Header />
-        <main className="py-10">{children}</main>
+        <Providers>
+          <Header />
+          <main className="py-10">{children}</main>
+        </Providers>
       </body>
     </html>
   );
