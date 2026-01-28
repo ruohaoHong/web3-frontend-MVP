@@ -1,6 +1,7 @@
 import { Container } from "@/components/layout/Container";
 import { Card } from "@/components/ui/Card";
 import { ConnectButton } from "@/components/web3/ConnectButton";
+import { AccountCard } from "@/components/web3/AccountCard";
 
 export default function HomePage() {
   return (
@@ -14,10 +15,13 @@ export default function HomePage() {
           <ConnectButton />
         </Card>
 
+        <AccountCard />
+
         <Card title="Vibe Prompt（給 AI）">
           <p className="text-sm text-black/70">
-            Add a ConnectButton component using RainbowKit. Place it on the home
-            page inside a Card.
+            Build AccountCard using wagmi hooks: useAccount,
+            useBalance, useChainId. Display address, chain,
+            and formatted native balance.
           </p>
         </Card>
       </div>

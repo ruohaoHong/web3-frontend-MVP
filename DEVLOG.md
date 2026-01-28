@@ -1,4 +1,5 @@
-# DEVLOG
+# DEVLOG 
+# Commits mark safe checkpoints. Push when the checkpoint is demo-able and worth revisiting.
 
 > Purpose:
 > This devlog exists only to help AI and future me recall recent changes,
@@ -89,3 +90,34 @@
 
 - Next:
   - Display connected account info (address, chain, balance)
+
+---
+
+## feat(web3): account card (address + balance + chain)
+
+- Goal:
+  Display connected wallet account information including address, chain, and native ETH balance.
+
+- Files:
+  - src/components/web3/AccountCard.tsx
+  - src/lib/format.ts
+  - src/app/page.tsx
+
+- Verify:
+  - `pnpm dev` runs without errors
+  - When wallet is disconnected, AccountCard shows a safe placeholder message
+  - When connected, address is displayed in shortened format
+  - Current chain name and chainId are shown
+  - Native ETH balance is displayed and formatted
+  - Page refresh does not trigger `WagmiProviderNotFoundError`
+
+- Risk:
+  - Balance formatting relies on bigint → number conversion and may lose precision for very large values
+  - Chain display currently assumes Sepolia; adding multi-chain support requires refactor
+
+- Rollback:
+  - Revert this commit to remove account display and return to wallet-only UI
+
+- Next:
+  - Add network switcher UI to allow switching between supported chains
+
