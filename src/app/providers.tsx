@@ -1,37 +1,50 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { WagmiProvider, type Config } from "wagmi";
+import { WagmiProvider, type Config, createConfig, http } from "wagmi";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { sepolia } from "wagmi/chains";
+import { injected } from "wagmi/connectors";
 
 import "@rainbow-me/rainbowkit/styles.css";
 
-import type { CreateConnectorFn } from "wagmi";
-
 export default function Providers({ children }: { children: React.ReactNode }) {
-  const [config, setConfig] = useState<Config | null>(null);
+  /**
+   * 建立一個「安全的初始 config」
+   * - 只有 injected
+   * - 不碰 walletconnect / indexedDB
+   * - 保證 WagmiProvider 永遠存在
+   */
+  const [config, setConfig] = useState<Config>(() =>
+    createConfig({
+      chains: [sepolia],
+      transports: {
+        [sepolia.id]: http(),
+      },
+      connectors: [injected()],
+      ssr: false,
+    })
+  );
+
   const [queryClient] = useState(() => new QueryClient());
 
   useEffect(() => {
     let mounted = true;
 
     (async () => {
-      const { createConfig, http } = await import("wagmi");
-      const { sepolia } = await import("wagmi/chains");
-      const { injected, coinbaseWallet, walletConnect } = await import(
+      const { walletConnect, coinbaseWallet } = await import(
         "wagmi/connectors"
       );
 
       const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
-      const connectors: CreateConnectorFn[] = [
+      const connectors = [
         injected(),
         ...(projectId
           ? [
               walletConnect({
                 projectId,
-                // 先開著，避免某些情況下沒有 QR modal
                 showQrModal: true,
               }),
             ]
@@ -41,7 +54,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         }),
       ];
 
-      const cfg = createConfig({
+      const nextConfig = createConfig({
         chains: [sepolia],
         transports: {
           [sepolia.id]: http(),
@@ -50,16 +63,13 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         ssr: false,
       });
 
-      if (mounted) setConfig(cfg);
+      if (mounted) setConfig(nextConfig);
     })();
 
     return () => {
       mounted = false;
     };
   }, []);
-
-  // Config 還沒建立前先渲染 children，避免 hydration/SSR 問題
-  if (!config) return <>{children}</>;
 
   return (
     <WagmiProvider config={config}>
