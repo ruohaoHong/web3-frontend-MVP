@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { useAccount, useSwitchChain } from "wagmi";
 import { sepolia, lineaSepolia } from "wagmi/chains";
 import { Card } from "@/components/ui/Card";
@@ -25,7 +25,18 @@ function mapSwitchError(err: unknown): string {
   return msg || "Switch failed. Please try again.";
 }
 
+// React-recommended client-only gate without useEffect/setState
+function useIsClient() {
+  return useSyncExternalStore(
+    () => () => {}, // no subscription needed
+    () => true,     // client snapshot
+    () => false     // server snapshot
+  );
+}
+
 export function NetworkCard() {
+  const isClient = useIsClient();
+
   const { isConnected, chain } = useAccount();
   const { switchChainAsync, isPending, error } = useSwitchChain();
 
@@ -40,7 +51,6 @@ export function NetworkCard() {
       await switchChainAsync({ chainId: targetChainId });
       setNotice({ kind: "success", text: "Network switched." });
     } catch (err) {
-      // Ensure no unhandled rejections + show human readable error
       setNotice({ kind: "error", text: mapSwitchError(err) });
     }
   }
@@ -49,12 +59,13 @@ export function NetworkCard() {
   const isOnSepolia = currentChainId === sepolia.id;
   const isOnLinea = currentChainId === lineaSepolia.id;
 
-  // If wagmi exposes an error but we didn't catch it (rare), show it without setState.
   const derivedErrorText = !notice && error ? mapSwitchError(error) : null;
 
   return (
     <Card title="Network">
-      {!isConnected ? (
+      {!isClient ? (
+        <p className="text-sm text-black/60">Loading wallet state…</p>
+      ) : !isConnected ? (
         <p className="text-sm text-black/60">Connect wallet to view network.</p>
       ) : (
         <div className="space-y-3 text-sm">

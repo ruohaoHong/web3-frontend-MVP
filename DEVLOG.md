@@ -154,3 +154,40 @@
 
 - Next:
   - Implement sign message flow gated by Web3Guard
+
+---
+
+## feat(web3): sign message flow
+
+- Goal:
+  Implement a sign message demo flow (no gas): input → sign → show signature, with human-readable errors and Web3 gating.
+
+- Files:
+  - src/components/web3/SignMessageCard.tsx
+  - src/components/web3/Web3Guard.tsx
+  - src/components/web3/NetworkCard.tsx
+  - src/app/page.tsx
+
+- Verify:
+  - `pnpm dev` runs without errors
+  - Connected on a supported chain:
+    - Input accepts a message (with a default demo message)
+    - Clicking Sign opens wallet prompt
+    - On success, signature is displayed and can be copied
+  - User rejects signature:
+    - UI shows a clear message (e.g. "User rejected signature.")
+    - No unhandled rejections / no red console errors
+  - Disconnected:
+    - Web3Guard gates the section and shows a "Not connected" message
+  - Unsupported chain:
+    - Web3Guard gates the section and shows a "Wrong network" message
+
+- Risk:
+  - Wallet connection state may differ between SSR and client hydration; NetworkCard uses a client-only gate to avoid mismatches
+  - Gating unmounts children, so local UI state (e.g., signature) resets when disconnecting or switching to unsupported chain
+
+- Rollback:
+  - Revert this commit to remove SignMessage flow and restore previous Web3 section behavior
+
+- Next:
+  - Add contract read (ERC20 balanceOf) or a native send tx with lifecycle UI

@@ -4,6 +4,7 @@ import { ConnectButton } from "@/components/web3/ConnectButton";
 import { AccountCard } from "@/components/web3/AccountCard";
 import { NetworkCard } from "@/components/web3/NetworkCard";
 import { Web3Guard } from "@/components/web3/Web3Guard";
+import { SignMessageCard } from "@/components/web3/SignMessageCard";
 
 export default function HomePage() {
   return (
@@ -20,15 +21,18 @@ export default function HomePage() {
         <NetworkCard />
 
         <Web3Guard>
-          <AccountCard />
+          <div className="space-y-6">
+            <AccountCard />
+            <SignMessageCard />
+          </div>
         </Web3Guard>
 
         <Card title="Vibe Prompt（給 AI）">
           <p className="text-sm text-black/70">
-            Implement NetworkCard with useSwitchChain for post-connection
-            network handling. Show current chain name + chainId. Support
-            switching between Sepolia and Linea Sepolia. If on unsupported
-            chain, show Wrong network and gate the Web3 section.
+            Implement SignMessageCard with useSignMessage. Provide input + Sign
+            button. Disable when disconnected or on unsupported chain (use
+            Web3Guard). Display signature on success, user-friendly error on
+            reject. No unhandled console errors.
           </p>
         </Card>
       </div>

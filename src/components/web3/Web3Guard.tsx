@@ -7,8 +7,19 @@ import { Card } from "@/components/ui/Card";
 export function Web3Guard({ children }: { children: ReactNode }) {
   const { isConnected, chain } = useAccount();
 
-  // Not connected: let child components handle their own "not connected" UI
-  if (!isConnected) return <>{children}</>;
+  // Disconnected: gate the web3 section
+  if (!isConnected) {
+    return (
+      <Card title="Web3">
+        <div className="space-y-2 text-sm">
+          <div className="font-medium">Not connected</div>
+          <div className="text-black/60">
+            Please connect your wallet to use Web3 features.
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   // Connected but unsupported: gate the web3 section
   if (chain === undefined) {
