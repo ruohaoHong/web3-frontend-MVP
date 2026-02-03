@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { WagmiProvider, type Config, createConfig, http } from "wagmi";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { sepolia } from "wagmi/chains";
+import { sepolia, lineaSepolia } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 
 import "@rainbow-me/rainbowkit/styles.css";
@@ -18,9 +18,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
    */
   const [config, setConfig] = useState<Config>(() =>
     createConfig({
-      chains: [sepolia],
+      chains: [sepolia, lineaSepolia],
       transports: {
         [sepolia.id]: http(),
+        [lineaSepolia.id]: http(),
       },
       connectors: [injected()],
       ssr: false,
@@ -33,9 +34,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     let mounted = true;
 
     (async () => {
-      const { walletConnect, coinbaseWallet } = await import(
-        "wagmi/connectors"
-      );
+      const { walletConnect, coinbaseWallet } = await import("wagmi/connectors");
 
       const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
@@ -55,9 +54,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       ];
 
       const nextConfig = createConfig({
-        chains: [sepolia],
+        chains: [sepolia, lineaSepolia],
         transports: {
           [sepolia.id]: http(),
+          [lineaSepolia.id]: http(),
         },
         connectors,
         ssr: false,

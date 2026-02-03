@@ -121,3 +121,36 @@
 - Next:
   - Add network switcher UI to allow switching between supported chains
 
+---
+
+## feat(web3): network switcher (post-connection) + add linea sepolia
+
+- Goal:
+  Add post-connection network switching (Sepolia ↔ Linea Sepolia) and gate Web3 actions on unsupported chains.
+
+- Files:
+  - src/app/providers.tsx
+  - src/components/web3/NetworkCard.tsx
+  - src/components/web3/Web3Guard.tsx
+  - src/app/page.tsx
+
+- Verify:
+  - `pnpm dev` runs without errors and no red console errors / unhandled rejections
+  - NetworkCard shows current chain name + chainId after connecting
+  - Switch buttons:
+    - Disabled when already on the target chain
+    - Successful switch shows a success notice
+  - Manual wallet switch to an unsupported chain:
+    - NetworkCard shows "Wrong network"
+    - Web3 section is gated by Web3Guard with a clear message
+  - Rejecting a switch request shows a user-friendly error message
+
+- Risk:
+  - Unsupported-chain detection depends on `useAccount().chain === undefined` (requires wagmi config to include all supported chains)
+  - Switching behavior differs across wallets/providers; some may not support programmatic switching
+
+- Rollback:
+  - Revert this commit to return to single-network behavior and remove gating
+
+- Next:
+  - Implement sign message flow gated by Web3Guard
