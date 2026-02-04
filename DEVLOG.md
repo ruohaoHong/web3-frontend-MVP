@@ -227,3 +227,35 @@
 
 - Next:
   - Implement contract write (ERC20 transfer) or native send tx with lifecycle UI + explorer link
+
+---
+
+## feat(web3): contract write (erc20 transfer)
+
+- Goal:
+  Submit an ERC20 `transfer(to, amount)` transaction and display the tx hash (no confirmation lifecycle yet).
+
+- Files:
+  - src/abi/erc20.ts
+  - src/components/web3/ContractWriteCard.tsx
+  - src/app/page.tsx
+
+- Verify:
+  - `pnpm dev` runs without errors
+  - In Web3Guard (connected + supported chain):
+    - Load token address (manual + Load or "Use demo token")
+    - Enter valid `to` address and `amount > 0`
+    - Click Transfer → wallet prompt appears → after submission shows tx hash
+  - User rejects in wallet → UI shows a human-readable error
+  - Disconnected / unsupported chain → gated by Web3Guard
+  - No red console errors / no unhandled rejections
+
+- Risk:
+  - Amount conversion assumes 18 decimals (explicitly stated); tokens with different decimals will transfer unexpected units
+  - This commit does not wait for confirmations; a tx hash does not guarantee success on-chain
+
+- Rollback:
+  - Revert this commit to remove ERC20 transfer UI and restore read-only state
+
+- Next:
+  - Add tx lifecycle UI (pending/success/error) and explorer link for submitted transactions

@@ -6,6 +6,7 @@ import { NetworkCard } from "@/components/web3/NetworkCard";
 import { Web3Guard } from "@/components/web3/Web3Guard";
 import { SignMessageCard } from "@/components/web3/SignMessageCard";
 import { ContractReadCard } from "@/components/web3/ContractReadCard";
+import { ContractWriteCard } from "@/components/web3/ContractWriteCard";
 
 export default function HomePage() {
   return (
@@ -26,15 +27,17 @@ export default function HomePage() {
             <AccountCard />
             <SignMessageCard />
             <ContractReadCard />
+            <ContractWriteCard />
           </div>
         </Web3Guard>
 
         <Card title="Vibe Prompt（給 AI）">
           <p className="text-sm text-black/70">
-            Add ERC20 ABI and implement ContractReadCard using useReadContract to
-            read balanceOf for the connected address. Provide token address input
-            with basic validation. Display balance (raw acceptable, optionally
-            format using decimals). Guard via Web3Guard. Handle errors gracefully.
+            Implement ContractWriteCard using useWriteContract to call ERC20
+            transfer(to, amount). Provide to + amount inputs with basic
+            validation. Show tx hash after submission and map common errors
+            (user rejected) to friendly UI. Use Web3Guard. Do not implement
+            confirmation lifecycle yet.
           </p>
         </Card>
       </div>
