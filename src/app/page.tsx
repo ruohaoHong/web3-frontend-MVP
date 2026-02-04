@@ -5,6 +5,7 @@ import { AccountCard } from "@/components/web3/AccountCard";
 import { NetworkCard } from "@/components/web3/NetworkCard";
 import { Web3Guard } from "@/components/web3/Web3Guard";
 import { SignMessageCard } from "@/components/web3/SignMessageCard";
+import { ContractReadCard } from "@/components/web3/ContractReadCard";
 
 export default function HomePage() {
   return (
@@ -24,15 +25,16 @@ export default function HomePage() {
           <div className="space-y-6">
             <AccountCard />
             <SignMessageCard />
+            <ContractReadCard />
           </div>
         </Web3Guard>
 
         <Card title="Vibe Prompt（給 AI）">
           <p className="text-sm text-black/70">
-            Implement SignMessageCard with useSignMessage. Provide input + Sign
-            button. Disable when disconnected or on unsupported chain (use
-            Web3Guard). Display signature on success, user-friendly error on
-            reject. No unhandled console errors.
+            Add ERC20 ABI and implement ContractReadCard using useReadContract to
+            read balanceOf for the connected address. Provide token address input
+            with basic validation. Display balance (raw acceptable, optionally
+            format using decimals). Guard via Web3Guard. Handle errors gracefully.
           </p>
         </Card>
       </div>

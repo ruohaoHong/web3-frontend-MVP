@@ -191,3 +191,39 @@
 
 - Next:
   - Add contract read (ERC20 balanceOf) or a native send tx with lifecycle UI
+  
+---
+
+## feat(web3): add erc20 abi + token read
+
+- Goal:
+  Add ERC20 ABI and a contract read UI to query `balanceOf` for the connected address, with optional decimals formatting and a demo token helper.
+
+- Files:
+  - src/abi/erc20.ts
+  - src/lib/constants.ts
+  - src/components/web3/ContractReadCard.tsx
+  - src/app/page.tsx
+
+- Verify:
+  - `pnpm dev` runs without errors
+  - Disconnected / unsupported chain: gated by Web3Guard (card not interactive / not shown in Web3 section)
+  - Token address input validates 0x address; invalid input does not trigger reads
+  - After loading a valid ERC20 address (or clicking "Use demo token"):
+    - Reads `balanceOf(connectedAddress)` successfully
+    - Shows raw uint256 balance (BigInt string) with clear "Raw" labeling
+  - Optional formatting:
+    - Enabling "Format using decimals" triggers `decimals()` read and shows formatted value when available
+    - If `decimals()` fails, UI falls back gracefully to raw display
+  - Switching between supported chains resets token input/active token state to avoid chain-specific confusion
+  - No red console errors / no unhandled rejections
+
+- Risk:
+  - Token addresses are chain-specific; wrong-chain addresses may revert or decode-fail (handled via UI error messaging)
+  - Remount-on-chain-change resets local UI state by design (may surprise users but reduces incorrect cross-chain assumptions)
+
+- Rollback:
+  - Revert this commit to remove ERC20 read functionality and demo token helpers
+
+- Next:
+  - Implement contract write (ERC20 transfer) or native send tx with lifecycle UI + explorer link

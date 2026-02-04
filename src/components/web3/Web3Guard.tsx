@@ -3,11 +3,28 @@
 import type { ReactNode } from "react";
 import { useAccount } from "wagmi";
 import { Card } from "@/components/ui/Card";
+import { useSyncExternalStore } from "react";
+
+function useIsClient() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
 
 export function Web3Guard({ children }: { children: ReactNode }) {
+  const isClient = useIsClient();
   const { isConnected, chain } = useAccount();
 
-  // Disconnected: gate the web3 section
+  if (!isClient) {
+    return (
+      <Card title="Web3">
+        <p className="text-sm text-black/60">Loading wallet state…</p>
+      </Card>
+    );
+  }
+
   if (!isConnected) {
     return (
       <Card title="Web3">
@@ -21,7 +38,6 @@ export function Web3Guard({ children }: { children: ReactNode }) {
     );
   }
 
-  // Connected but unsupported: gate the web3 section
   if (chain === undefined) {
     return (
       <Card title="Web3">
