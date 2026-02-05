@@ -301,3 +301,32 @@
 
 - Next:
   - Add tx lifecycle UI to other actions (native send / contract reads/writes), and optionally add “copy hash” + “reset tx” controls
+
+  ---
+
+## feat(vibe): add /vibe page (ai-assisted ui mini tool)
+
+- Goal:
+  Add an interactive `/vibe` page that turns small inputs into a calm, premium UI preview driven by a copyable CSS variable token set.
+
+- Files:
+  - src/app/vibe/page.tsx
+
+- Verify:
+  - `/vibe` route loads and is interactive
+  - Changing inputs (theme/radius/density/keyword/mode) updates preview immediately
+  - Empty state shows when no theme is selected and no custom accent is provided
+  - Validation state shows for invalid custom accent (#RRGGBB) and disables Copy
+  - Tokens panel outputs a full CSS variables block and preview reads from those variables
+  - Copy button works (clipboard success notice; graceful fallback message if unavailable)
+  - `pnpm build` passes; no red console errors
+
+- Risk:
+  - Clipboard API may be unavailable outside https/localhost; fallback message is required
+  - Inline style usage relies on CSS variable support; should be fine for modern browsers but keep scope limited to `/vibe`
+
+- Rollback:
+  - Revert this commit to remove the `/vibe` page and related UI iteration demo
+
+- Next:
+  - Polish preview interactions (copy-toasts, small a11y tweaks) and link `/vibe` from the main header for discoverability
