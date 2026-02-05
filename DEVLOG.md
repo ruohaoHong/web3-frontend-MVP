@@ -259,3 +259,45 @@
 
 - Next:
   - Add tx lifecycle UI (pending/success/error) and explorer link for submitted transactions
+
+---
+
+## feat(web3): tx lifecycle ui + explorer links
+
+- Goal:
+  Add single-tx lifecycle UI (pending/success/error) with chain-aware explorer links, including correct handling for MetaMask speed up/cancel (replacement tx).
+
+- Files:
+  - src/hooks/useExplorerLink.ts
+  - src/hooks/useTxState.ts
+  - src/components/web3/TxStatus.tsx
+  - src/components/web3/ContractWriteCard.tsx
+
+- Verify:
+  - `pnpm dev` runs without errors
+  - After submitting an ERC20 transfer:
+    - Shows pending immediately (awaiting wallet → submitted/pending)
+    - After 1 confirmation, shows success and explorer link
+  - User rejects/cancels before submission (no hash):
+    - Shows friendly error and no explorer link
+  - MetaMask Speed up:
+    - UI detects replacement and updates to the latest tx hash
+    - Explorer link points to the latest hash (not the dropped one)
+    - Eventually resolves to success/error (no infinite pending)
+  - MetaMask Cancel:
+    - UI detects cancellation as replacement tx
+    - After cancellation confirms, shows “Cancelled” state (no infinite pending)
+  - Explorer links are chain-aware:
+    - Sepolia uses Etherscan
+    - Linea Sepolia provides LineaScan and Linea explorer (Blockscout)
+  - No red console errors / no unhandled rejections
+
+- Risk:
+  - Explorer indexing lag can temporarily show “not found” even for valid hashes; UI follows replacement hash to reduce dropped-hash links
+  - Replacement handling is wallet/provider dependent; behavior may vary across wallets/networks
+
+- Rollback:
+  - Revert this commit to remove lifecycle tracking and fall back to showing only tx hash without confirmation state
+
+- Next:
+  - Add tx lifecycle UI to other actions (native send / contract reads/writes), and optionally add “copy hash” + “reset tx” controls
