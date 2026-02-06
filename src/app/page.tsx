@@ -31,15 +31,7 @@ export default function HomePage() {
           </div>
         </Web3Guard>
 
-        <Card title="Vibe Prompt（給 AI）">
-          <p className="text-sm text-black/70">
-            Implement ContractWriteCard using useWriteContract to call ERC20
-            transfer(to, amount). Provide to + amount inputs with basic
-            validation. Show tx hash after submission and map common errors
-            (user rejected) to friendly UI. Use Web3Guard. Do not implement
-            confirmation lifecycle yet.
-          </p>
-        </Card>
+
       </div>
     </Container>
   );

@@ -330,3 +330,33 @@
 
 - Next:
   - Polish preview interactions (copy-toasts, small a11y tweaks) and link `/vibe` from the main header for discoverability
+
+  ---
+
+## docs: add README + screenshots + run instructions
+
+- Goal:
+  Add a resume-ready README that explains the Web3 MVP + `/vibe`, lists features/stack, and provides setup/run instructions with screenshots.
+
+- Files:
+  - README.md
+  - public/screenshots/home.(png|webp)
+  - public/screenshots/vibe.(png|webp)
+  - .env.example
+
+- Verify:
+  - README renders correctly on GitHub and is scannable (What it is / Features / Stack / Setup / Run / Screenshots)
+  - Code blocks use `~~~`
+  - Screenshot images load in README
+  - Setup instructions are complete (mentions `.env.local` and `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`)
+  - `pnpm dev` and `pnpm build` still work
+
+- Risk:
+  - Screenshot paths may break if filenames or folders change (keep `public/screenshots/*` stable)
+  - Wording like “prompt” can be misread as AI prompt; prefer “wallet confirmation” / “signature confirmation”
+
+- Rollback:
+  - Revert this commit to return to the previous documentation state.
+
+- Next:
+  - Move any AI/process notes out of product UI into dedicated docs (e.g., `VIBE_CODING_PROCESS*.md`, `PROMPTS*.md`) and link them from README.
