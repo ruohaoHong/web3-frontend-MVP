@@ -7,6 +7,14 @@
 
 ---
 
+## Demo
+
+- 線上 demo：`https://web3-frontend-mvp.vercel.app/`
+
+> 註：若未設定 `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`，注入式錢包（例如 MetaMask）仍應可使用；WalletConnect 相關流程可能受限，但頁面不應崩潰。
+
+---
+
 ## Screenshots
 
 > （本 repo 先附上 placeholder 圖，方便 README 完整。你可以隨時用真實截圖覆蓋同一路徑。）
@@ -112,6 +120,13 @@ pnpm install
 cp .env.example .env.local
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=YOUR_PROJECT_ID
 ```
+**安全註記（WalletConnect Project ID）**
+- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` 是前端可見的 public identifier，並非機密。
+- 為避免被濫用造成配額/流量消耗，建議在 WalletConnect dashboard 設定「允許來源（allowed origins / domain allowlist）」，只允許自己的網域與本機開發環境。
+
+範例 allowlist：
+- https://web3-frontend-mvp.vercel.app
+- http://localhost:3000
 
 2) repo 內已提供 `.env.example` 作為說明（可參考）
 
@@ -132,6 +147,23 @@ pnpm dev
 pnpm build
 pnpm start
 ```
+
+---
+
+## 部署（Vercel
+
+### 步驟
+1) 在 Vercel 匯入此 GitHub repo
+2) Framework preset：Next.js（通常自動偵測）
+3) 設定環境變數（可選）：
+   - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`
+4) Deploy
+
+### 部署後驗收
+- `/` 與 `/vibe` 都能正常開啟
+- 未設定 `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` 時頁面不會崩，MetaMask（injected）仍可連
+- 設定 env 後，WalletConnect 相關選項可用
+- 切鏈與 tx lifecycle UI 正常
 
 ---
 

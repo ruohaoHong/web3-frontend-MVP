@@ -1,75 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { WagmiProvider, type Config, createConfig, http } from "wagmi";
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { useMemo, useState } from "react";
+import { WagmiProvider, createConfig, http } from "wagmi";
+import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { sepolia, lineaSepolia } from "wagmi/chains";
-import { injected } from "wagmi/connectors";
+import { injected, coinbaseWallet } from "wagmi/connectors";
 
 import "@rainbow-me/rainbowkit/styles.css";
 
+const chains = [sepolia, lineaSepolia] as const;
+
 export default function Providers({ children }: { children: React.ReactNode }) {
-  /**
-   * 建立一個「安全的初始 config」
-   * - 只有 injected
-   * - 不碰 walletconnect / indexedDB
-   * - 保證 WagmiProvider 永遠存在
-   */
-  const [config, setConfig] = useState<Config>(() =>
-    createConfig({
-      chains: [sepolia, lineaSepolia],
-      transports: {
-        [sepolia.id]: http(),
-        [lineaSepolia.id]: http(),
-      },
-      connectors: [injected()],
-      ssr: false,
-    })
-  );
+  const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
-  const [queryClient] = useState(() => new QueryClient());
-
-  useEffect(() => {
-    let mounted = true;
-
-    (async () => {
-      const { walletConnect, coinbaseWallet } = await import("wagmi/connectors");
-
-      const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
-
-      const connectors = [
-        injected(),
-        ...(projectId
-          ? [
-              walletConnect({
-                projectId,
-                showQrModal: true,
-              }),
-            ]
-          : []),
-        coinbaseWallet({
-          appName: "Web3 Frontend MVP",
-        }),
-      ];
-
-      const nextConfig = createConfig({
-        chains: [sepolia, lineaSepolia],
+  const config = useMemo(() => {
+    // ✅ 有 projectId：用 RainbowKit 官方 getDefaultConfig
+    if (projectId) {
+      return getDefaultConfig({
+        appName: "Web3 Frontend MVP",
+        projectId,
+        chains: [...chains],
+        ssr: false,
         transports: {
           [sepolia.id]: http(),
           [lineaSepolia.id]: http(),
         },
-        connectors,
-        ssr: false,
       });
+    }
 
-      if (mounted) setConfig(nextConfig);
-    })();
+    // ✅ 沒 projectId：fallback（至少 injected / coinbase 可用，且不崩潰）
+    return createConfig({
+      chains: [...chains],
+      transports: {
+        [sepolia.id]: http(),
+        [lineaSepolia.id]: http(),
+      },
+      connectors: [
+        injected(),
+        coinbaseWallet({
+          appName: "Web3 Frontend MVP",
+        }),
+      ],
+      ssr: false,
+    });
+  }, [projectId]);
 
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <WagmiProvider config={config}>

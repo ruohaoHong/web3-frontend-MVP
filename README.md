@@ -9,6 +9,14 @@ Two resume-ready mini projects in one repo:
 
 ---
 
+## Demo
+
+- Live demo: `https://web3-frontend-mvp.vercel.app/`
+
+> Note: If `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is missing, injected wallets (e.g., MetaMask) should still work. WalletConnect options may be limited, but the app should not crash.
+
+---
+
 ## Screenshots
 
 > Placeholder images are included to keep the README complete. Replace them anytime with real screenshots at the same paths.
@@ -116,6 +124,14 @@ This project uses `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` (recommended in `.env.l
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=YOUR_PROJECT_ID
 ```
 
+**Security note (WalletConnect Project ID)**
+- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is a public identifier (client-side). It is not a secret.
+- To reduce abuse/quota drain, configure an **allowed-origins / domain allowlist** for the project in the WalletConnect dashboard (e.g. allow only your Vercel domain and `http://localhost:3000`).
+
+Example allowlist:
+- `https://web3-frontend-mvp.vercel.app`
+- `http://localhost:3000`
+
 2) `.env.example` is provided as a reference.
 
 > Without a project id:
@@ -136,6 +152,22 @@ Open:
 pnpm build
 pnpm start
 ```
+
+---
+
+## Deploy (Vercel)
+
+### Steps
+1) Import this GitHub repo into Vercel
+2) Framework preset: Next.js (auto-detected)
+3) (Optional) Add Env Var:
+   - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`
+4) Deploy
+
+### Verify after deploy
+- Home and `/vibe` both load
+- Wallet connect works (MetaMask injected should work even if WalletConnect project id is not set)
+- Switching networks and tx lifecycle UI work as expected
 
 ---
 
