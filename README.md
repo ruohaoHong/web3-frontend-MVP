@@ -1,5 +1,7 @@
 [English](./README.md) | [繁體中文](./README.zh-TW.md)
 
+`This MVP focuses on safe wallet UX and transaction lifecycle state handling, which maps to trading/analytics UI reliability.`
+
 # Web3 Frontend MVP + /vibe
 
 Two resume-ready mini projects in one repo:
@@ -15,11 +17,24 @@ Two resume-ready mini projects in one repo:
 
 > Note: If `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is missing, injected wallets (e.g., MetaMask) should still work. WalletConnect options may be limited, but the app should not crash.
 
+### How to test (recommended)
+- Use a **test wallet** and small test funds only.
+- Why Sepolia + Linea Sepolia: a widely-used L1 testnet + an L2 testnet, good for demonstrating **network switch** and **explorer differences**.
+- Get test ETH (keywords): **"Sepolia faucet"**, **"Linea Sepolia faucet"**.
+
+## 30-second tour
+
+1) Open the demo: `https://web3-frontend-mvp.vercel.app/`
+2) Click **Connect** and connect with an injected wallet (MetaMask).  
+3) Try **Network switch**: Sepolia ↔ Linea Sepolia (and see **Wrong network gating** when unsupported).
+4) Try **Sign message** and copy the signature.
+5) Try **ERC20 read**: click “Use demo token” → see `balanceOf` (raw).
+6) Try **ERC20 transfer** and watch **TxStatus** (pending → success/error) with explorer links.
+7) Visit `/vibe` and tweak theme/radius/spacing → copy the generated CSS tokens.
+
 ---
 
 ## Screenshots
-
-> Placeholder images are included to keep the README complete. Replace them anytime with real screenshots at the same paths.
 
 - Home (Web3 MVP)  
   ![Home](./public/screenshots/home.png)
@@ -55,14 +70,28 @@ A deploy-safe, frontend-only UI iteration sandbox:
 
 ## Development approach (AI-assisted)
 
-This repo was built in small, demoable commits (each commit runs and adds one capability).
-- DEVLOG: `DEVLOG.md` (risks, verification, rollback notes)
-- Prompts (per commit): `PROMPTS.md`
-- Vibe coding process: `VIBE_CODING_PROCESS.md`
+If you want to review how this repo was built (traceable and demoable commits):
+
+- `DEVLOG.md` — per-commit notes: verification steps, risks, rollback strategy
+- `PROMPTS.md` — prompts used for each commit (what was asked / implemented)
+- `VIBE_CODING_PROCESS.md` — my AI-assisted workflow + guardrails
 
 ---
 
 ## Features (scannable)
+
+### Feature → Source map
+
+| Feature | Source (entry points) |
+|---|---|
+| Wrong network gating | `src/components/web3/Web3Guard.tsx` |
+| Post-connection network switch | `src/components/web3/NetworkCard.tsx` |
+| Account info (address/chain/balance) | `src/components/web3/AccountCard.tsx` |
+| Sign message | `src/components/web3/SignMessageCard.tsx` |
+| ERC20 read (`balanceOf`) | `src/components/web3/ContractReadCard.tsx`, `src/abi/erc20.ts` |
+| ERC20 write (`transfer`) | `src/components/web3/ContractWriteCard.tsx`, `src/abi/erc20.ts` |
+| Explorer links (chain-aware) | `src/hooks/useExplorerLink.ts` |
+| Replacement tx tracking (Speed Up / Cancel) | `src/hooks/useTxState.ts` + `src/components/web3/TxStatus.tsx` |
 
 ### Wallet & Network
 - RainbowKit connect wallet
@@ -125,8 +154,9 @@ NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=YOUR_PROJECT_ID
 ```
 
 **Security note (WalletConnect Project ID)**
-- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is a public identifier (client-side). It is not a secret.
-- To reduce abuse/quota drain, configure an **allowed-origins / domain allowlist** for the project in the WalletConnect dashboard (e.g. allow only your Vercel domain and `http://localhost:3000`).
+- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is a **public identifier** (used client-side). Treat it as public, and protect your quota with **allowed-origins/domain allowlisting** plus **usage monitoring/limits** in the WalletConnect dashboard.
+- To reduce abuse/quota drain, configure an **Allowed Origins** (domain allowlist) for the project in the WalletConnect dashboard (e.g., only your Vercel domain and `http://localhost:3000`).
+- Never store it as a secret; instead, enforce origin restrictions and monitor usage to prevent unauthorized traffic.
 
 Example allowlist:
 - `https://web3-frontend-mvp.vercel.app`
@@ -202,9 +232,17 @@ pnpm start
 
 ---
 
-## Notes / Limitations
-- ERC20 transfer amount: currently assumes 18 decimals (MVP tradeoff; can be improved by reading decimals)
-- Demo token is for testing only; token addresses are chain-specific (different per chain)
-- Frontend-only demo (no backend, no external APIs)
+## Known assumptions / limitations
+
+### Contracts
+- ERC20 transfer amount currently **assumes 18 decimals** (explicit in UI).  
+  *(Tradeoff for MVP; can be improved by reading `decimals()` and converting.)*
+- ERC20 read defaults to **raw** `balanceOf` (uint256 / BigInt).  
+  Formatting via `decimals()` is optional (kept small for MVP scope).
+- Demo token addresses are **chain-specific** (Sepolia vs Linea Sepolia).
+
+### Wallet / Networks
+- Supported chains: **Sepolia ↔ Linea Sepolia** (to demonstrate L1/L2 testnet switching + explorer differences).
+- Frontend-only demo (no backend, no indexer).
 
 ---

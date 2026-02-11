@@ -13,11 +13,24 @@
 
 > 註：若未設定 `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`，注入式錢包（例如 MetaMask）仍應可使用；WalletConnect 相關流程可能受限，但頁面不應崩潰。
 
+### 推薦測試方式
+- 建議使用 **測試錢包**，只放少量測試幣。
+- 為何選 Sepolia + Linea Sepolia：主流 L1 測試鏈 + L2 測試鏈，能展示 **切鏈** 與 **explorer 差異**。
+- 取得測試幣（關鍵字）：**「Sepolia faucet」**、**「Linea Sepolia faucet」**
+
+## 30 秒導覽
+
+1) 打開 Demo：`https://web3-frontend-mvp.vercel.app/`
+2) 點 **Connect**，用瀏覽器錢包（MetaMask）連線  
+3) 試 **切鏈**：Sepolia ↔ Linea Sepolia（切到不支援鏈會看到 **Wrong network gating**）
+4) 試 **Sign message**：成功後可複製 signature
+5) 試 **ERC20 read**：按「Use demo token」→ 看到 `balanceOf`（raw）
+6) 試 **ERC20 transfer**：送出後看 **TxStatus**（pending → success/error）+ explorer link
+7) 打開 `/vibe`：改主題/圓角/間距 → 複製 CSS tokens
+
 ---
 
 ## Screenshots
-
-> （本 repo 先附上 placeholder 圖，方便 README 完整。你可以隨時用真實截圖覆蓋同一路徑。）
 
 - Home (Web3 MVP)  
   ![Home](./public/screenshots/home.png)
@@ -51,14 +64,30 @@
 - Copy tokens（clipboard）+ 成功提示（不支援時提供 fallback 提示）
 - 不使用外部 API
 
-## 開發方式（Vibe Coding） 
-- 開發流程（中文）：`VIBE_CODING_PROCESS.zh-TW.md `
-- 步驟提示詞（中文）：`PROMPTS.zh-TW.md `
-- 每次 commit 記錄：`DEVLOG.md`
+## 開發方式（AI-assisted / Vibe Coding）
+
+如果你想看整個過程（可溯源、可驗證的 commit）：
+
+- `DEVLOG.md` — 每個 commit 的驗證方式 / 風險 / rollback
+- `PROMPTS.zh-TW.md` — 每個 commit 的提示詞（做了什麼、怎麼做）
+- `VIBE_CODING_PROCESS.zh-TW.md` — 我的 Vibe Coding 流程與守則
 
 ---
 
 ## Features (scannable)
+
+### Feature → Source 對照
+
+| 功能 | 對應程式碼（入口） |
+|---|---|
+| Wrong network gating | `src/components/web3/Web3Guard.tsx` |
+| 連線後切鏈 | `src/components/web3/NetworkCard.tsx` |
+| 帳戶資訊（地址/鏈/餘額） | `src/components/web3/AccountCard.tsx` |
+| Sign message | `src/components/web3/SignMessageCard.tsx` |
+| ERC20 讀取（`balanceOf`） | `src/components/web3/ContractReadCard.tsx`, `src/abi/erc20.ts` |
+| ERC20 轉帳（`transfer`） | `src/components/web3/ContractWriteCard.tsx`, `src/abi/erc20.ts` |
+| Explorer links（依鏈） | `src/hooks/useExplorerLink.ts` |
+| Replacement tx 追蹤（加速/取消） | `src/hooks/useTxState.ts` + `src/components/web3/TxStatus.tsx` |
 
 ### Wallet & Network
 - RainbowKit connect wallet
@@ -120,9 +149,9 @@ pnpm install
 cp .env.example .env.local
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=YOUR_PROJECT_ID
 ```
-**安全註記（WalletConnect Project ID）**
-- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` 是前端可見的 public identifier，並非機密。
-- 為避免被濫用造成配額/流量消耗，建議在 WalletConnect dashboard 設定「允許來源（allowed origins / domain allowlist）」，只允許自己的網域與本機開發環境。
+**安全性說明（WalletConnect Project ID）**
+- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` 為前端使用的公開識別碼，請視為公開資訊。
+- 建議在 WalletConnect Dashboard 設定 **Allowed Origins（網域白名單）**（僅允許 Vercel 網域與 `http://localhost:3000`），並搭配用量監控/限制以避免濫用與配額耗盡。
 
 範例 allowlist：
 - https://web3-frontend-mvp.vercel.app
@@ -150,7 +179,7 @@ pnpm start
 
 ---
 
-## 部署（Vercel
+## 部署(Vercel)
 
 ### 步驟
 1) 在 Vercel 匯入此 GitHub repo
@@ -198,9 +227,16 @@ pnpm start
 
 ---
 
-## Notes / Limitations
-- ERC20 transfer amount：目前假設 18 decimals（MVP 取捨，之後可改成讀 decimals）
-- Demo token 為測試用途，且 token address 是 chain-specific（不同鏈可能不同）
-- 全部為純前端 demo（無後端、無外部 API）
+## 已知假設 / 限制（Known limitations）
+
+### Contracts
+- ERC20 transfer 金額目前 **假設 18 decimals**（UI 有明示）。  
+  （MVP 取捨；可改成讀 `decimals()` 後轉換）
+- ERC20 read 預設顯示 `balanceOf` 的 **raw** 值（uint256 / BigInt）；格式化屬於可選（避免一次做太大）
+- Demo token address **依鏈不同**（Sepolia / Linea Sepolia）
+
+### Wallet / Networks
+- 支援鏈：**Sepolia ↔ Linea Sepolia**（用來展示切鏈與 explorer 差異）
+- 純前端 demo（無後端、無 indexer）
 
 ---
